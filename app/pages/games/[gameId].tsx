@@ -1,37 +1,10 @@
 import { Suspense, useEffect, useState } from "react"
-import { Head, Link, useRouter, useQuery, useParam, BlitzPage, useMutation, Routes } from "blitz"
+import { Head, Link, useQuery, useParam, BlitzPage, useMutation, Routes } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import getGame from "app/games/queries/getGame"
 import updateGame from "app/games/mutations/updateGame"
 import joinGame from "app/games/mutations/joinGame"
 import whoWins from "app/games/utils/whoWins"
-
-export const Border = ({ children }) => {
-  const gameId = useParam("gameId", "number") || 0
-  const [token, setToken] = useState(localStorage.getItem(`${gameId}`) || undefined)
-  const [game, { refetch }] = useQuery(getGame, { id: gameId, token }, { refetchInterval: 1000 })
-  const [joinGameMutation] = useMutation(joinGame, {
-    onSuccess: (token) => {
-      localStorage.setItem(`${gameId}`, token || "")
-      setToken(token)
-      refetch()
-    },
-  })
-
-  useEffect(() => {
-    if (!token && game.status === "waiting") {
-      joinGameMutation({ id: gameId })
-    }
-  }, [gameId, game, token, joinGameMutation])
-
-  return (
-    <>
-      {game.status === "waiting" && <div>Waiting for another player...</div>}
-      {game.status === "playing" && children}
-      {game.status === "over" && children}
-    </>
-  )
-}
 
 export const Game = () => {
   const gameId = useParam("gameId", "number") || 0
@@ -47,11 +20,6 @@ export const Game = () => {
     { id: gameId, token },
     {
       refetchInterval: 1000,
-      onSuccess: (game) => {
-        if (!token && game.status === "waiting") {
-          joinGameMutation({ id: gameId })
-        }
-      },
     }
   )
   const [updateGameMutation] = useMutation(updateGame, {
@@ -59,6 +27,11 @@ export const Game = () => {
       refetch()
     },
   })
+  useEffect(() => {
+    if (!token && game.status === "waiting") {
+      joinGameMutation({ id: gameId })
+    }
+  }, [joinGameMutation, token, gameId, game.status])
 
   return (
     <>
@@ -88,7 +61,7 @@ export const Game = () => {
             ))}
           </div>
         )}
-        {game.status === "over" && <div>The Player {whoWins(game as any)} has won the match</div>}
+        {game.status === "over" && <div>{whoWins(game as any)} has won the match</div>}
       </div>
     </>
   )

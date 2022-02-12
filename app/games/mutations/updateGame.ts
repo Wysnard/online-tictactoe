@@ -29,11 +29,13 @@ export default resolver.pipe(resolver.zod(UpdateGame), async ({ id, token, x, y 
   // Check if move is valid
   if (game.state[x + y * 3] !== " ") throw new Error("Invalid move")
 
-  return await db.game.update({
+  const updatedGame = await db.game.update({
     where: { id },
     data: {
       turn: game.turn + 1,
       state: setCharAt(game.state, x + y * 3, activePlayer),
     },
   })
+
+  return { ...updatedGame, status: computeGameStatus(updatedGame) }
 })
