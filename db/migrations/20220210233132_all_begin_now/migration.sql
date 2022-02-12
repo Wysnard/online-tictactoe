@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "TokenType" AS ENUM ('RESET_PASSWORD');
+CREATE TYPE "TokenType" AS ENUM ('RESET_PASSWORD', 'VERIFY_EMAIL');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -58,3 +58,17 @@ ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE "Game" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "turn" INTEGER NOT NULL DEFAULT 0,
+    "state" TEXT NOT NULL DEFAULT E'',
+    "player1" TEXT NOT NULL,
+    "player2" TEXT,
+
+    CONSTRAINT "Game_pkey" PRIMARY KEY ("id")
+);

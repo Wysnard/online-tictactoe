@@ -40,3 +40,14 @@ export const ChangePassword = z.object({
   currentPassword: z.string(),
   newPassword: password,
 })
+
+export const JoinGame = z.object({
+  id: z.number(),
+})
+
+export const UpdateGame = z.object({
+  id: z.number(),
+  token: z.string(),
+  x: z.number(),
+  y: z.number(),
+})
